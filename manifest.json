@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "English Polisher",
+  "version": "1.0.0",
+  "description": "Fix grammar or paraphrase selected text into natural human English, using free AI (Gemini free tier, Chrome built-in AI, Groq, OpenRouter) or Claude.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.groq.com/*",
+    "https://openrouter.ai/*",
+    "https://api.anthropic.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "English Polisher"
+  },
+  "options_page": "options.html",
+  "commands": {
+    "fix-grammar": {
+      "suggested_key": { "default": "Alt+Shift+F" },
+      "description": "Fix grammar of selected text"
+    },
+    "humanize": {
+      "suggested_key": { "default": "Alt+Shift+H" },
+      "description": "Paraphrase selection into natural human English"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

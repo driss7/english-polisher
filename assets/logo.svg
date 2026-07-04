@@ -1,0 +1,36 @@
+<svg width="760" height="220" viewBox="0 0 760 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="English Polisher">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#274b9e"/>
+      <stop offset="1" stop-color="#16306e"/>
+    </linearGradient>
+    <radialGradient id="paper" cx="0.2" cy="-0.1" r="1.1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4f0e8"/>
+    </radialGradient>
+  </defs>
+
+  <!-- self-contained card so it reads well on any GitHub theme -->
+  <rect x="8" y="8" width="744" height="204" rx="26" fill="url(#paper)" stroke="#e6e0d3" stroke-width="1.5"/>
+
+  <!-- nib tile -->
+  <g transform="translate(48, 54)">
+    <rect width="112" height="112" rx="26" fill="url(#tile)"/>
+    <g transform="translate(-8,-8) scale(0.875)">
+      <g transform="rotate(-40 64 64)">
+        <path fill-rule="evenodd" fill="#faf7f1"
+              d="M64 112 C52 92 46 74 46 59 C46 43 54 33 64 33 C74 33 82 43 82 59 C82 74 76 92 64 112 Z
+                 M59 55 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0
+                 M61.6 60 L66.4 60 L64 104 Z"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- wordmark + tagline -->
+  <text x="196" y="102" font-family="'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif"
+        font-style="italic" font-weight="600" font-size="46" fill="#16306e">English Polisher</text>
+  <text x="198" y="140" font-family="'Avenir Next',Avenir,'Segoe UI',system-ui,sans-serif"
+        font-size="19" fill="#6b6459">Fix your grammar or rewrite it to sound human —</text>
+  <text x="198" y="166" font-family="'Avenir Next',Avenir,'Segoe UI',system-ui,sans-serif"
+        font-size="19" fill="#6b6459">powered by free AI, right in your browser.</text>
+</svg>

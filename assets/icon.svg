@@ -1,0 +1,16 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="English Polisher">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#274b9e"/>
+      <stop offset="1" stop-color="#16306e"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="128" height="128" rx="28" fill="url(#tile)"/>
+  <!-- angled fountain-pen nib: leaf blade + slit + breather hole, cut via even-odd -->
+  <g transform="rotate(-40 64 64)">
+    <path fill-rule="evenodd" fill="#faf7f1"
+          d="M64 112 C52 92 46 74 46 59 C46 43 54 33 64 33 C74 33 82 43 82 59 C82 74 76 92 64 112 Z
+             M59 55 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0
+             M61.6 60 L66.4 60 L64 104 Z"/>
+  </g>
+</svg>
