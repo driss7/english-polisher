@@ -49,7 +49,7 @@ load();
 
 // Support links — set your Buy Me a Coffee handle here. The link stays hidden
 // until a real URL is configured, so no dead link ever ships.
-const COFFEE_URL = ""; // e.g. "https://buymeacoffee.com/yourhandle"
+const COFFEE_URL = "https://buymeacoffee.com/driss7";
 if (COFFEE_URL) {
   $("coffeeLink").href = COFFEE_URL;
 } else {
