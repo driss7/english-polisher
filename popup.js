@@ -77,6 +77,25 @@ $("openOptions").addEventListener("click", (e) => {
   chrome.runtime.openOptionsPage();
 });
 
+// ---------- page diagnosis (for debugging sites where the button won't show) ----------
+$("diag").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const reports = [];
+  const listener = (m) => { if (m?.type === "DIAG_REPORT") reports.push(m.data); };
+  chrome.runtime.onMessage.addListener(listener);
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab?.id) await chrome.tabs.sendMessage(tab.id, { type: "DIAGNOSE" }).catch(() => {});
+  } catch {}
+  show("collecting…", "busy");
+  setTimeout(() => {
+    chrome.runtime.onMessage.removeListener(listener);
+    // frames with editors or focus first, empty frames last
+    reports.sort((a, b) => (b.editables + b.textareas + b.focusChain.length) - (a.editables + a.textareas + a.focusChain.length));
+    show(reports.length ? JSON.stringify(reports, null, 1) : "No frames responded — refresh the tab and try again.", reports.length ? "" : "error");
+  }, 700);
+});
+
 // ---------- content-script status for the active tab ----------
 (async () => {
   const s = $("pageStatus");

@@ -4,7 +4,7 @@
 // result panel when the selection is read-only. (Right-click mode was removed.)
 
 (() => {
-  const VERSION = 10;
+  const VERSION = 11;
   // Legacy guard (pre-versioning scripts) or an equal/newer script already active:
   // bail so we never end up with two message listeners double-handling events.
   if (window.__englishPolisherLoaded || (window.__epVersion || 0) >= VERSION) return;
@@ -42,7 +42,41 @@
   window.__epHandle = (msg, _sender, sendResponse) => {
     if (msg.type === "PING") sendResponse({ v: VERSION });
     else if (msg.type === "RUN_SHORTCUT") runShortcut(msg.mode);
+    else if (msg.type === "DIAGNOSE") {
+      try { chrome.runtime.sendMessage({ type: "DIAG_REPORT", data: collectDiag() }); } catch (_) {}
+    }
   };
+
+  // Structure report used by the popup's "diagnose" link — helps debug sites
+  // whose editors hide inside shadow DOM (e.g. Reddit).
+  function collectDiag() {
+    const a = deepActive();
+    const chain = [];
+    let n = document.activeElement;
+    while (n) {
+      chain.push(n.tagName + (n.shadowRoot ? "▸open-sr" : n.tagName.includes("-") ? "▸closed-or-no-sr" : ""));
+      n = n.shadowRoot && n.shadowRoot.activeElement;
+    }
+    return {
+      v: VERSION,
+      frame: window.top === window ? "top" : "iframe",
+      url: location.href.slice(0, 100),
+      editables: document.querySelectorAll("[contenteditable]").length,
+      textareas: document.querySelectorAll("textarea").length,
+      composers: [...document.querySelectorAll(
+        "shreddit-composer, comment-composer-host, shreddit-simple-composer, faceplate-textarea-input, [rpl][role='textbox']"
+      )].map((e) => e.tagName + ":" + (e.shadowRoot ? "open-sr" : "closed-or-no-sr")),
+      focusChain: chain,
+      active: a ? {
+        tag: a.tagName,
+        ce: a.getAttribute && a.getAttribute("contenteditable"),
+        role: a.getAttribute && a.getAttribute("role"),
+        cls: (a.className && String(a.className).slice(0, 60)) || "",
+      } : null,
+      eligible: !!eligibleHost(a),
+      dot: epDot ? epDot.style.display : "n/a",
+    };
+  }
   if (firstLoad) {
     chrome.runtime.onMessage.addListener((m, s, r) => window.__epHandle(m, s, r));
   }
@@ -200,7 +234,10 @@
       if (t.readOnly || t.disabled) return null;
       return t.clientWidth >= 200 ? t : null;
     }
-    if (t.isContentEditable) return t.closest('[contenteditable=""],[contenteditable="true"]') || t;
+    // contenteditable (incl. plaintext-only) and ARIA textboxes (many custom editors)
+    if (t.isContentEditable || (t.getAttribute && (t.getAttribute("contenteditable") === "plaintext-only" || t.getAttribute("role") === "textbox"))) {
+      return t.closest('[contenteditable=""],[contenteditable="true"],[contenteditable="plaintext-only"],[role="textbox"]') || t;
+    }
     return null;
   }
 
