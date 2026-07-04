@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "English Polisher",
   "version": "1.0.0",
-  "description": "Fix grammar or paraphrase selected text into natural human English, using free AI (Gemini free tier, Chrome built-in AI, Groq, OpenRouter) or Claude.",
+  "description": "Fix grammar or rewrite text to sound human — using free AI (Gemini, Chrome built-in AI, Groq, OpenRouter) or Claude.",
   "homepage_url": "https://github.com/driss7/english-polisher",
   "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
   "host_permissions": [
