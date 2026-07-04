@@ -46,3 +46,12 @@ async function save() {
 $("provider").addEventListener("change", showBlocks);
 $("save").addEventListener("click", save);
 load();
+
+// Support links — set your Buy Me a Coffee handle here. The link stays hidden
+// until a real URL is configured, so no dead link ever ships.
+const COFFEE_URL = ""; // e.g. "https://buymeacoffee.com/yourhandle"
+if (COFFEE_URL) {
+  $("coffeeLink").href = COFFEE_URL;
+} else {
+  $("coffeeLink").style.display = "none";
+}
