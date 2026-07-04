@@ -94,6 +94,8 @@ In settings you can add standing instructions applied to every rewrite, e.g. *"K
 - **Your text** is sent only to the provider you configure — except **Chrome built-in AI**, which runs entirely on your device and sends nothing.
 - The extension has no analytics and no backend of its own.
 
+See the full [privacy policy](PRIVACY.md).
+
 ## Project structure
 
 ```
@@ -116,6 +118,17 @@ There is no build step — it's plain HTML/CSS/JS loaded directly by Chrome.
 3. For content-script changes (keyboard shortcuts), also refresh any open tabs.
 
 Adding a provider is a matter of adding a `case` to `rewrite()` in `background.js` and a settings block in `options.html`.
+
+## Publishing to the Chrome Web Store
+
+The repo is submission-ready:
+
+- Run `./build-zip.sh` to produce `english-polisher-<version>.zip` (only the files Chrome runs).
+- [`STORE_LISTING.md`](STORE_LISTING.md) has the ready-to-paste listing copy, permission justifications, and data-usage answers.
+- [`PRIVACY.md`](PRIVACY.md) is the privacy policy the store requires.
+- `store/` contains the 1280×800 screenshots and a 440×280 promo tile.
+
+Publishing itself needs a [Chrome Web Store developer account](https://chrome.google.com/webstore/devconsole) (one-time $5 fee): upload the ZIP, paste the listing, attach the screenshots, and submit for review.
 
 ## License
 
