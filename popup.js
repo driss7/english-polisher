@@ -120,15 +120,16 @@ $("ctxToggle").addEventListener("click", saveDraft);
   if (draft.result) show(draft.result, "");
 })();
 
-$("clearDraft").addEventListener("click", (e) => {
-  e.preventDefault();
-  for (const id of ["input", "instruction", "context"]) $(id).value = "";
-  $("ctxWrap").classList.remove("open");
-  $("ctxToggle").classList.remove("open");
-  resultCard.style.display = "none";
-  draftStore?.remove("draft");
-  (tabs.dataset.active === "polish" ? $("input") : $("instruction")).focus();
-});
+document.querySelectorAll(".clearDraft").forEach((btn) =>
+  btn.addEventListener("click", () => {
+    for (const id of ["input", "instruction", "context"]) $(id).value = "";
+    $("ctxWrap").classList.remove("open");
+    $("ctxToggle").classList.remove("open");
+    resultCard.style.display = "none";
+    draftStore?.remove("draft");
+    (tabs.dataset.active === "polish" ? $("input") : $("instruction")).focus();
+  })
+);
 
 // ---------- page diagnosis (for debugging sites where the button won't show) ----------
 $("diag").addEventListener("click", async (e) => {

@@ -39,7 +39,15 @@
       border-bottom: 1px dotted var(--line);
     }
     header a:hover { color: var(--accent); border-color: var(--accent); }
-    #clearDraft { margin-left: auto; margin-right: 10px; }
+    .field-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .field-row label.field { margin: 0; }
+    .clearDraft {
+      padding: 2px 12px; cursor: pointer;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: #fffdf9; font: 600 11px var(--sans); color: var(--ink);
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .clearDraft:hover { border-color: var(--err); color: var(--err); background: #fdf1ef; }
 
     main { padding: 12px 16px 14px; }
 
@@ -159,14 +167,16 @@
       <button id="tabPolish" class="active">Polish</button>
       <button id="tabAsk">Ask</button>
     </div>
-    <a href="#" id="clearDraft" title="Clear all fields">clear</a>
-    <a href="#" id="openOptions">settings</a>
+    <a href="#" id="openOptions" style="margin-left:auto">settings</a>
   </header>
 
   <main>
     <!-- POLISH: one box, three actions -->
     <section class="pane active" id="panePolish">
-      <label class="field" for="input">Your text</label>
+      <div class="field-row">
+        <label class="field" for="input">Your text</label>
+        <button type="button" class="clearDraft" title="Clear all fields and the saved draft">✕ clear</button>
+      </div>
       <textarea id="input" rows="6" placeholder="Paste the text you want cleaned up…"></textarea>
       <div class="actions">
         <button data-mode="fix">Fix<span class="sub">grammar</span></button>
@@ -177,7 +187,10 @@
 
     <!-- ASK: instruction first, context clearly optional & separate -->
     <section class="pane" id="paneAsk">
-      <label class="field" for="instruction">What should I write?</label>
+      <div class="field-row">
+        <label class="field" for="instruction">What should I write?</label>
+        <button type="button" class="clearDraft" title="Clear all fields and the saved draft">✕ clear</button>
+      </div>
       <textarea id="instruction" rows="3" placeholder='e.g. "Reply to this email — interested, but ask about pricing"'></textarea>
 
       <button id="ctxToggle">add context <em>(the email you're replying to, notes…)</em></button>
