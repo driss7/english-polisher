@@ -4,7 +4,7 @@
 // result panel when the selection is read-only. (Right-click mode was removed.)
 
 (() => {
-  const VERSION = 5;
+  const VERSION = 6;
   // Legacy guard (pre-versioning scripts) or an equal/newer script already active:
   // bail so we never end up with two message listeners double-handling events.
   if (window.__englishPolisherLoaded || (window.__epVersion || 0) >= VERSION) return;
@@ -220,6 +220,20 @@
     return null;
   }
 
+  // The deepest focused element, descending through open shadow roots
+  // (Reddit, many web-component editors put the real field in a shadow tree).
+  function deepActive() {
+    let a = document.activeElement;
+    while (a && a.shadowRoot && a.shadowRoot.activeElement) a = a.shadowRoot.activeElement;
+    return a;
+  }
+
+  // Selection object for the field's tree — shadow roots have their own in Chrome.
+  function fieldSelection(host) {
+    const root = host.getRootNode();
+    return root && typeof root.getSelection === "function" ? root.getSelection() : window.getSelection();
+  }
+
   function initInline() {
     ensureStyles();
 
@@ -269,7 +283,11 @@
 
   function onFocusIn(e) {
     if (!epEnabled) return;
-    const host = eligibleHost(e.target);
+    // composedPath()[0] is the true target even when the event crosses a shadow
+    // boundary (e.target would be retargeted to the shadow host otherwise).
+    const path = typeof e.composedPath === "function" ? e.composedPath() : null;
+    const target = path && path.length ? path[0] : e.target;
+    const host = eligibleHost(target);
     if (!host) return;
     clearTimeout(epHideTimer);
     epHost = host;
@@ -280,7 +298,7 @@
   function onFocusOut() {
     clearTimeout(epHideTimer);
     epHideTimer = setTimeout(() => {
-      if (!epBusy && !eligibleHost(document.activeElement)) hideInline();
+      if (!epBusy && !eligibleHost(deepActive())) hideInline();
     }, 200);
   }
 
@@ -291,7 +309,8 @@
   }
 
   function reposition() {
-    if (!epHost || !document.contains(epHost)) return hideInline();
+    // isConnected (not document.contains) — the host may live in a shadow tree.
+    if (!epHost || !epHost.isConnected) return hideInline();
     const r = epHost.getBoundingClientRect();
     if (r.width < 40 || r.height < 12 || r.bottom < 0 || r.top > innerHeight) {
       epDot.style.display = "none";
@@ -330,35 +349,34 @@
       if (e <= s) { s = 0; e = host.value.length; }   // no selection → whole field
       return { kind: "input", start: s, end: e, text: host.value.slice(s, e) };
     }
-    const sel = window.getSelection();
-    let range;
-    if (sel && sel.rangeCount && !sel.isCollapsed && host.contains(sel.anchorNode)) {
-      range = sel.getRangeAt(0).cloneRange();
-    } else {
-      range = document.createRange();
-      range.selectNodeContents(host);
+    const sel = fieldSelection(host);
+    if (sel && sel.rangeCount && !sel.isCollapsed && sel.toString().trim() && host.contains(sel.anchorNode)) {
+      return { kind: "ce", whole: false, range: sel.getRangeAt(0).cloneRange(), text: sel.toString() };
     }
-    return { kind: "ce", range, text: range.toString() };
+    return { kind: "ce", whole: true, text: host.innerText ?? host.textContent ?? "" };
   }
 
   function applyToField(host, info, text) {
+    host.focus();
     if (info.kind === "input") {
-      host.focus();
       host.setSelectionRange(info.start, info.end);
       if (!document.execCommand("insertText", false, text)) {
         host.setRangeText(text, info.start, info.end, "end");
         host.dispatchEvent(new Event("input", { bubbles: true }));
       }
-    } else {
-      host.focus();
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(info.range);
-      if (!document.execCommand("insertText", false, text)) {
-        info.range.deleteContents();
-        info.range.insertNode(document.createTextNode(text));
-        host.dispatchEvent(new Event("input", { bubbles: true }));
-      }
+      return;
+    }
+    // contenteditable — select the target (whole field or the saved selection),
+    // then insertText so rich editors (Gmail, Reddit/Lexical) see a normal edit.
+    if (info.whole) {
+      document.execCommand("selectAll", false);
+    } else if (info.range) {
+      const sel = fieldSelection(host);
+      try { sel.removeAllRanges(); sel.addRange(info.range); } catch (_) {}
+    }
+    if (!document.execCommand("insertText", false, text) && info.whole) {
+      host.textContent = text;   // last resort for editors that block execCommand
+      host.dispatchEvent(new Event("input", { bubbles: true }));
     }
   }
 
@@ -366,16 +384,11 @@
     epBusy = on;
     epDot.classList.toggle("busy", on);
     host.classList.toggle("__ep-field-busy", on);
-    const isInput = host.tagName === "INPUT" || host.tagName === "TEXTAREA";
-    if (on) {
-      if (isInput) { host.__epRO = host.readOnly; host.readOnly = true; }
-      else { host.__epCE = host.getAttribute("contenteditable"); host.setAttribute("contenteditable", "false"); }
-    } else if (isInput) {
-      host.readOnly = host.__epRO || false;
-    } else if (host.__epCE == null) {
-      host.removeAttribute("contenteditable");
-    } else {
-      host.setAttribute("contenteditable", host.__epCE);
+    // Only lock plain inputs/textareas; leaving rich editors alone avoids
+    // corrupting their internal state (e.g. Lexical).
+    if (host.tagName === "INPUT" || host.tagName === "TEXTAREA") {
+      if (on) { host.__epRO = host.readOnly; host.readOnly = true; }
+      else host.readOnly = host.__epRO || false;
     }
   }
 

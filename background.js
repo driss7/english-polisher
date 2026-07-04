@@ -82,7 +82,7 @@ async function sendEnsuring(tabId, payload) {
   }
 }
 
-const CONTENT_VERSION = 5;
+const CONTENT_VERSION = 6;
 
 // After an extension update, already-open tabs keep running the old content
 // script (Chrome never hot-swaps them). Detect that and tell the user to
