@@ -4,7 +4,7 @@
 // result panel when the selection is read-only. (Right-click mode was removed.)
 
 (() => {
-  const VERSION = 9;
+  const VERSION = 10;
   // Legacy guard (pre-versioning scripts) or an equal/newer script already active:
   // bail so we never end up with two message listeners double-handling events.
   if (window.__englishPolisherLoaded || (window.__epVersion || 0) >= VERSION) return;
@@ -39,8 +39,9 @@
   // of adding a second onMessage listener. With all_frames, the background
   // broadcasts RUN_SHORTCUT to every frame; only the frame holding the focused
   // field (or an active selection) acts, so nothing is duplicated.
-  window.__epHandle = (msg) => {
-    if (msg.type === "RUN_SHORTCUT") runShortcut(msg.mode);
+  window.__epHandle = (msg, _sender, sendResponse) => {
+    if (msg.type === "PING") sendResponse({ v: VERSION });
+    else if (msg.type === "RUN_SHORTCUT") runShortcut(msg.mode);
   };
   if (firstLoad) {
     chrome.runtime.onMessage.addListener((m, s, r) => window.__epHandle(m, s, r));

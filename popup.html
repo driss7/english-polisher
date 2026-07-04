@@ -146,6 +146,9 @@
     footer {
       padding: 8px 16px 12px; font: italic 11px var(--serif); color: var(--ink-soft);
     }
+    #pageStatus { margin-bottom: 3px; font: 10.5px var(--sans); }
+    #pageStatus.ok { color: var(--ok); }
+    #pageStatus.warn { color: var(--err); }
   </style>
 </head>
 <body>
@@ -194,7 +197,10 @@
     </div>
   </main>
 
-  <footer>Tip: select text in a field, then press Alt+Shift+F to fix it in place.</footer>
+  <footer>
+    <div id="pageStatus"></div>
+    <div>Tip: select text in a field, then press Alt+Shift+F to fix it in place.</div>
+  </footer>
 
   <script src="popup.js"></script>
 </body>

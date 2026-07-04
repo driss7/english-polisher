@@ -76,3 +76,29 @@ $("openOptions").addEventListener("click", (e) => {
   e.preventDefault();
   chrome.runtime.openOptionsPage();
 });
+
+// ---------- content-script status for the active tab ----------
+(async () => {
+  const s = $("pageStatus");
+  let tab;
+  try {
+    [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  } catch { return; }
+  if (!tab?.id) return;
+  try {
+    const resp = await chrome.tabs.sendMessage(tab.id, { type: "PING" });
+    if (resp?.v) {
+      s.textContent = `✓ In-page button active on this tab (v${resp.v})`;
+      s.className = "ok";
+      return;
+    }
+    throw new Error("no response");
+  } catch {
+    if (tab.url && !/^https?:/i.test(tab.url)) {
+      s.textContent = "In-page button can’t run on this page type (browser page / store / PDF).";
+    } else {
+      s.textContent = "⚠ In-page button not running in this tab — refresh the page (⌘⇧R).";
+      s.className = "warn";
+    }
+  }
+})();
