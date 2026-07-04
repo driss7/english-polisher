@@ -4,86 +4,45 @@
 // result panel when the selection is read-only. (Right-click mode was removed.)
 
 (() => {
-  const VERSION = 6;
+  const VERSION = 7;
   // Legacy guard (pre-versioning scripts) or an equal/newer script already active:
   // bail so we never end up with two message listeners double-handling events.
   if (window.__englishPolisherLoaded || (window.__epVersion || 0) >= VERSION) return;
   const firstLoad = !window.__epVersion;
   window.__epVersion = VERSION;
 
-  let lastTarget = null;   // input/textarea element, or contenteditable host
-  let lastRange = null;    // Range for contenteditable selections
-  let lastInputSel = null; // {start, end} for input/textarea
-
   // Swappable dispatcher: future re-injections replace window.__epHandle instead
-  // of adding a second onMessage listener.
-  window.__epHandle = (msg, _sender, sendResponse) => {
-    if (msg.type === "GET_SELECTION") {
-      sendResponse({ text: captureSelection(), v: VERSION });
-    } else if (msg.type === "SHOW_BUSY") {
-      showToast("Rewriting…", "busy");
-    } else if (msg.type === "SHOW_ERROR") {
-      showToast(msg.error, "error", 6000);
-    } else if (msg.type === "SHOW_RESULT") {
-      handleResult(msg.result);
-    }
+  // of adding a second onMessage listener. With all_frames, the background
+  // broadcasts RUN_SHORTCUT to every frame; only the frame holding the focused
+  // field (or an active selection) acts, so nothing is duplicated.
+  window.__epHandle = (msg) => {
+    if (msg.type === "RUN_SHORTCUT") runShortcut(msg.mode);
   };
   if (firstLoad) {
     chrome.runtime.onMessage.addListener((m, s, r) => window.__epHandle(m, s, r));
   }
 
-  function captureSelection() {
-    const el = document.activeElement;
-    if (el && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && /^(text|search|url|email)$/i.test(el.type)))) {
-      const start = el.selectionStart ?? 0;
-      const end = el.selectionEnd ?? 0;
-      lastTarget = el;
-      lastInputSel = { start, end };
-      lastRange = null;
-      return end > start ? el.value.slice(start, end) : "";
-    }
+  // Keyboard-shortcut entry, frame-local: rewrite the focused field in place, or
+  // show a result panel for a read-only text selection in this frame.
+  function runShortcut(mode) {
+    const host = eligibleHost(deepActive());
+    if (host) { epHost = host; reposition(); runInline(mode); return; }
     const sel = window.getSelection();
-    if (sel && !sel.isCollapsed && sel.rangeCount > 0) {
-      const range = sel.getRangeAt(0);
-      const host = range.commonAncestorContainer;
-      const hostEl = host.nodeType === 1 ? host : host.parentElement;
-      lastRange = range.cloneRange();
-      lastTarget = hostEl?.closest?.('[contenteditable=""], [contenteditable="true"]') || null;
-      lastInputSel = null;
-      return sel.toString();
-    }
-    lastTarget = null;
-    lastRange = null;
-    lastInputSel = null;
-    return "";
+    const text = sel && !sel.isCollapsed ? sel.toString() : "";
+    if (text.trim()) runReadonly(mode, text);
   }
 
-  function handleResult(result) {
-    removeToast();
-    // 1) input / textarea — replace via execCommand to keep the undo stack.
-    if (lastTarget && lastInputSel && document.contains(lastTarget)) {
-      lastTarget.focus();
-      lastTarget.setSelectionRange(lastInputSel.start, lastInputSel.end);
-      if (!document.execCommand("insertText", false, result)) {
-        lastTarget.setRangeText(result, lastInputSel.start, lastInputSel.end, "end");
-        lastTarget.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-      showToast("Done ✓ (Cmd+Z to undo)", "ok", 3000);
-      return;
+  async function runReadonly(mode, text) {
+    showToast("Rewriting…", "busy");
+    try {
+      const resp = await chrome.runtime.sendMessage({ type: "REWRITE", mode, text: text.trim() });
+      removeToast();
+      if (resp?.ok) showResultPanel(resp.result);
+      else showToast(resp?.error || "Something went wrong.", "error", 6000);
+    } catch (err) {
+      removeToast();
+      showToast(String((err && err.message) || err), "error", 6000);
     }
-    // 2) contenteditable (Gmail, comment boxes, most rich editors).
-    if (lastTarget && lastRange) {
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(lastRange);
-      lastTarget.focus();
-      if (document.execCommand("insertText", false, result)) {
-        showToast("Done ✓ (Cmd+Z to undo)", "ok", 3000);
-        return;
-      }
-    }
-    // 3) read-only text — show the result in a small panel with a copy button.
-    showResultPanel(result);
   }
 
   // ---------- toast ----------
@@ -269,6 +228,17 @@
     window.addEventListener("scroll", () => { if (epHost) reposition(); }, true);
     window.addEventListener("resize", () => { if (epHost) reposition(); });
 
+    // Caret-based detection: catch the field even when a focus event didn't fire
+    // (programmatic focus, editors that manage focus themselves, etc.).
+    document.addEventListener("selectionchange", () => {
+      if (!epEnabled || epBusy) return;
+      const host = eligibleHost(deepActive());
+      if (!host) return;
+      if (host !== epHost) { epHost = host; epMenu.classList.remove("open"); }
+      clearTimeout(epHideTimer);
+      reposition();
+    });
+
     chrome.storage?.sync?.get({ inlineButton: true })?.then((v) => {
       epEnabled = v.inlineButton !== false;
       if (!epEnabled) hideInline();
@@ -279,6 +249,10 @@
         if (!epEnabled) hideInline();
       }
     });
+
+    // A field may already be focused when this frame's script loads.
+    const initHost = eligibleHost(deepActive());
+    if (initHost) { epHost = initHost; reposition(); }
   }
 
   function onFocusIn(e) {

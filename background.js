@@ -50,7 +50,8 @@ chrome.commands.onCommand.addListener(async (command) => {
   const mode = command === "fix-grammar" ? "fix" : command === "humanize" ? "humanize" : null;
   if (!mode) return;
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tab?.id != null) runOnTab(tab.id, mode, "");
+  // Broadcast to every frame; only the one with the focused field acts.
+  if (tab?.id != null) sendEnsuring(tab.id, { type: "RUN_SHORTCUT", mode });
 });
 
 // Popup and the in-page prompt panel call the rewriter directly.
@@ -80,45 +81,6 @@ async function sendEnsuring(tabId, payload) {
       return null;
     }
   }
-}
-
-const CONTENT_VERSION = 6;
-
-// After an extension update, already-open tabs keep running the old content
-// script (Chrome never hot-swaps them). Detect that and tell the user to
-// refresh the page instead of silently doing nothing.
-function staleGuard(tabId, sel) {
-  if (sel && sel.v !== CONTENT_VERSION) {
-    notify(tabId, {
-      type: "SHOW_ERROR",
-      error: "English Polisher was updated — refresh this page (⌘R) to use it here.",
-    });
-    return true;
-  }
-  return false;
-}
-
-async function runOnTab(tabId, mode, fallbackText) {
-  // Ask the content script for the exact selection (info.selectionText mangles newlines).
-  const sel = await sendEnsuring(tabId, { type: "GET_SELECTION" });
-  if (staleGuard(tabId, sel)) return;
-  const text = (sel?.text || fallbackText || "").trim();
-  if (!text) {
-    notify(tabId, { type: "SHOW_ERROR", error: "Select some text first." });
-    return;
-  }
-
-  notify(tabId, { type: "SHOW_BUSY", mode });
-  try {
-    const result = await rewrite(mode, text);
-    notify(tabId, { type: "SHOW_RESULT", mode, original: text, result });
-  } catch (err) {
-    notify(tabId, { type: "SHOW_ERROR", error: String(err.message || err) });
-  }
-}
-
-function notify(tabId, payload) {
-  chrome.tabs.sendMessage(tabId, payload).catch(() => {});
 }
 
 async function rewrite(mode, text) {

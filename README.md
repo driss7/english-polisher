@@ -82,6 +82,10 @@ corner. Click it to open **Fix / Humanize / Shorten**; the field (or your curren
 selection within it) is rewritten in place, with the button spinning and the field
 gently highlighted while it works. Undo with `⌘/Ctrl + Z`.
 
+It also works inside **embedded frames** (iframes) and **shadow-DOM editors** such
+as Reddit's comment and chat composers. It can't appear in editors that render
+their own canvas (e.g. Google Docs) or that use a closed shadow root.
+
 Prefer it off? Turn it off in **settings → In-page**.
 
 ### Keyboard shortcuts (edit in place on the page)
