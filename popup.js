@@ -65,6 +65,7 @@ function show(text, state) {
   resultCard.className = state; // "", "busy", "error"
   result.textContent = text;
   copyBtn.style.display = state ? "none" : "inline-block";
+  if (state === "") saveDraft(); // keep successful results across popup reopens
 }
 copyBtn.addEventListener("click", async () => {
   await navigator.clipboard.writeText(result.textContent);
@@ -75,6 +76,58 @@ copyBtn.addEventListener("click", async () => {
 $("openOptions").addEventListener("click", (e) => {
   e.preventDefault();
   chrome.runtime.openOptionsPage();
+});
+
+// ---------- draft persistence ----------
+// The popup is destroyed the moment it loses focus (a click anywhere outside),
+// so every keystroke is saved and restored on reopen. storage.session survives
+// popup closes but clears when the browser exits.
+const draftStore = chrome.storage?.session || chrome.storage?.local;
+let draftTimer = null;
+
+function saveDraft() {
+  if (!draftStore) return;
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    draftStore.set({
+      draft: {
+        input: $("input").value,
+        instruction: $("instruction").value,
+        context: $("context").value,
+        ctxOpen: $("ctxWrap").classList.contains("open"),
+        result: resultCard.style.display === "block" && resultCard.className === "" ? result.textContent : "",
+      },
+    });
+  }, 150);
+}
+
+for (const id of ["input", "instruction", "context"]) {
+  $(id).addEventListener("input", saveDraft);
+}
+$("ctxToggle").addEventListener("click", saveDraft);
+
+(async () => {
+  if (!draftStore) return;
+  const { draft } = await draftStore.get("draft");
+  if (!draft) return;
+  $("input").value = draft.input || "";
+  $("instruction").value = draft.instruction || "";
+  $("context").value = draft.context || "";
+  if (draft.ctxOpen || draft.context) {
+    $("ctxWrap").classList.add("open");
+    $("ctxToggle").classList.add("open");
+  }
+  if (draft.result) show(draft.result, "");
+})();
+
+$("clearDraft").addEventListener("click", (e) => {
+  e.preventDefault();
+  for (const id of ["input", "instruction", "context"]) $(id).value = "";
+  $("ctxWrap").classList.remove("open");
+  $("ctxToggle").classList.remove("open");
+  resultCard.style.display = "none";
+  draftStore?.remove("draft");
+  (tabs.dataset.active === "polish" ? $("input") : $("instruction")).focus();
 });
 
 // ---------- page diagnosis (for debugging sites where the button won't show) ----------
