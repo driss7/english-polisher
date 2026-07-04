@@ -4,7 +4,7 @@
 // result panel when the selection is read-only. (Right-click mode was removed.)
 
 (() => {
-  const VERSION = 7;
+  const VERSION = 8;
   // Legacy guard (pre-versioning scripts) or an equal/newer script already active:
   // bail so we never end up with two message listeners double-handling events.
   if (window.__englishPolisherLoaded || (window.__epVersion || 0) >= VERSION) return;
@@ -253,6 +253,26 @@
     // A field may already be focused when this frame's script loads.
     const initHost = eligibleHost(deepActive());
     if (initHost) { epHost = initHost; reposition(); }
+
+    // Diagnostic: click into a field, then run __epDebug() in the console.
+    window.__epDebug = () => {
+      const a = deepActive();
+      const info = {
+        version: VERSION,
+        frame: window.top === window ? "top" : "iframe",
+        url: location.href,
+        enabled: epEnabled,
+        activeTag: a && a.tagName,
+        activeType: a && a.getAttribute && a.getAttribute("type"),
+        isContentEditable: a && a.isContentEditable,
+        contentEditableAttr: a && a.getAttribute && a.getAttribute("contenteditable"),
+        rootType: a && a.getRootNode && a.getRootNode().constructor && a.getRootNode().constructor.name,
+        eligible: !!eligibleHost(a),
+        dotDisplay: epDot && epDot.style.display,
+      };
+      console.log("[English Polisher]", info);
+      return info;
+    };
   }
 
   function onFocusIn(e) {
