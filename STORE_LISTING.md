@@ -79,7 +79,7 @@ an instruction.
 
 Paste these into the corresponding fields in the dashboard.
 
-- **storage** — Stores the user's chosen AI provider, model, style preferences, and API key locally in the browser.
+- **storage** — Stores the user's chosen AI provider, model, style preferences, and API key locally in the browser, and keeps the popup's draft text in session storage (local, cleared on browser exit) so it isn't lost when the popup closes.
 - **contextMenus** — Adds the Fix / Humanize / Shorten actions to the right-click menu on selected text.
 - **activeTab** — Reads the user's current text selection on the active tab only when they invoke the extension (keyboard shortcut), so it can rewrite it.
 - **scripting** — Injects the content script into the active tab when needed to capture the selection and replace it in place.

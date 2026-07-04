@@ -1,6 +1,6 @@
 # Privacy Policy — English Polisher
 
-_Last updated: 2026-07-04_
+_Last updated: 2026-07-04 (added local popup-draft persistence)_
 
 English Polisher is a browser extension that fixes and rewrites text using an AI
 provider of your choice. This policy explains what data it handles and where that
@@ -21,7 +21,11 @@ data goes. It is written to be read, not to hide behind legalese.
 **Text you submit.** When you run Fix / Humanize / Shorten, or use Ask mode, the
 text (and any context you provide) is sent to the AI provider you selected in the
 extension's settings, over an HTTPS request, so it can return a rewrite. The
-extension does not store your text after the request completes.
+extension does not retain your text after the request completes, with one local
+exception: text typed into the popup (and the latest result) is kept as a draft in
+the browser's session storage so it isn't lost if the popup closes. Drafts never
+leave your device, are deleted when you close the browser, and can be removed at
+any time with the popup's "clear" button.
 
 **Your API key.** The key you paste in settings is stored using Chrome's
 `storage.sync` API (so it syncs across your own signed-in Chrome browsers). It is
@@ -31,6 +35,11 @@ extension.
 
 **Your preferences.** Your selected provider, model, and optional style
 instructions are stored the same way (`storage.sync`).
+
+**Popup drafts.** Text you type in the popup is saved locally in `storage.session`
+(in-memory, this browser only) purely so an accidental click doesn't wipe your
+draft. It is never synced or transmitted, disappears when the browser exits, and
+the popup's "clear" button deletes it immediately.
 
 The extension does **not** collect names, emails, browsing history, analytics,
 telemetry, or advertising identifiers.
@@ -52,9 +61,10 @@ the extension's settings.
 ## Data retention
 
 The extension itself retains only your settings and API key locally, until you
-change or clear them (removing the extension deletes them). It does not keep copies
-of the text you rewrite. Any retention of request data on the provider side is
-governed by that provider's policy, linked above.
+change or clear them (removing the extension deletes them). Popup drafts are kept
+locally only until the browser closes (or you press "clear"). Beyond that it keeps
+no copies of the text you rewrite. Any retention of request data on the provider
+side is governed by that provider's policy, linked above.
 
 ## Contact
 
