@@ -9,7 +9,7 @@ const DEFAULTS = {
   anthropicKey: "",
   anthropicModel: "claude-haiku-4-5",
   extraStyle: "",
-  inlineButton: true,
+  inlineButton: false, // experimental, off by default
 };
 
 const $ = (id) => document.getElementById(id);

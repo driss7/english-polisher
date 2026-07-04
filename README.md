@@ -23,7 +23,7 @@ No account, no server, no build step — load it unpacked and add a free API key
 
 - ✍️ **Polish mode** — one click to **Fix** grammar & spelling, **Humanize** stiff/robotic text, or **Shorten** it.
 - 💬 **Ask mode** — free-form instructions ("reply to this email politely declining", "write a short bio") with optional context you paste in.
-- 🖊️ **In-field button** — a small nib appears in the corner of any text box on the web; click it for Fix / Humanize / Shorten and the field is rewritten in place, with a loading state.
+- 🖊️ **In-field button** *(experimental, off by default)* — a small nib appears in the corner of text boxes on the web; click it for Fix / Humanize / Shorten and the field is rewritten in place, with a loading state.
 - 🆓 **Free by default** — Google Gemini's free tier needs no credit card; Chrome's built-in AI needs no key at all.
 - 🔌 **Five providers** — Gemini, Chrome built-in AI (Gemini Nano), Groq, OpenRouter, and Anthropic Claude. Switch anytime in settings.
 - ⌨️ **In-place editing** — select text in any editable field and press a shortcut to replace it (with undo).
@@ -74,30 +74,33 @@ Click the toolbar icon. Toggle between the two modes with the pill beside the ti
 
 Every result has a **Copy** button.
 
-### In-field button
+### In-field button (experimental)
 
-Click into any text box on a web page (textarea, comment box, rich editor, or a
-reasonably wide text input) and a small nib button appears in its bottom-right
-corner. Click it to open **Fix / Humanize / Shorten**; the field (or your current
-selection within it) is rewritten in place, with the button spinning and the field
-gently highlighted while it works. Undo with `⌘/Ctrl + Z`.
+**Off by default** — enable it in **settings → In-page**. Once on, click into a
+text box on a web page (textarea, comment box, rich editor, or a reasonably wide
+text input) and a small nib button appears in its bottom-right corner. Click it to
+open **Fix / Humanize / Shorten**; the field (or your current selection within it)
+is rewritten in place, with the button spinning and the field gently highlighted
+while it works. Undo with `⌘/Ctrl + Z`.
 
-It also works inside **embedded frames** (iframes) and **shadow-DOM editors** such
-as Reddit's comment and chat composers. It can't appear in editors that render
-their own canvas (e.g. Google Docs) or that use a closed shadow root.
+It works in most editors (Gmail, ChatGPT, comment boxes, iframe-embedded and
+open-shadow-DOM editors), but not all — some sites hide their editor from
+extensions entirely (e.g. Reddit's composer, Google Docs). That's why it's tagged
+experimental.
 
-Prefer it off? Turn it off in **settings → In-page**.
+### Right-click menu & keyboard shortcuts (edit in place on the page)
 
-### Keyboard shortcuts (edit in place on the page)
-
-Select text inside any editable field (Gmail, textareas, comment boxes) and press:
+Select text and right-click → **Fix grammar & spelling**, **Paraphrase — natural
+human tone**, or **Make it shorter & clearer**. Or use the shortcuts:
 
 | Shortcut | Action |
 |---|---|
 | `Alt + Shift + F` | Fix grammar & spelling |
 | `Alt + Shift + H` | Humanize the tone |
 
-The selection is replaced in place — `⌘/Ctrl + Z` undoes it. On read-only text, a small panel shows the result with a Copy button instead. Rebind the shortcuts at `chrome://extensions/shortcuts`.
+In editable fields the text is replaced in place — `⌘/Ctrl + Z` undoes it. On
+read-only text, a small panel shows the result with a Copy button instead. Rebind
+the shortcuts at `chrome://extensions/shortcuts`.
 
 ### Custom style (optional)
 

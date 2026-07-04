@@ -46,6 +46,23 @@ const DEFAULTS = {
   extraStyle: "", // optional user instruction appended to every system prompt
 };
 
+// Right-click menu on selected text. Routes through the same frame-local
+// RUN_SHORTCUT path as the keyboard shortcuts: editable field → rewrite in
+// place; read-only selection → result panel with Copy.
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.removeAll(() => {
+    for (const id of ["fix", "humanize", "shorten"]) {
+      chrome.contextMenus.create({ id, title: MODES[id].title, contexts: ["selection", "editable"] });
+    }
+  });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (tab?.id != null && MODES[info.menuItemId]) {
+    sendEnsuring(tab.id, { type: "RUN_SHORTCUT", mode: info.menuItemId });
+  }
+});
+
 chrome.commands.onCommand.addListener(async (command) => {
   const mode = command === "fix-grammar" ? "fix" : command === "humanize" ? "humanize" : null;
   if (!mode) return;

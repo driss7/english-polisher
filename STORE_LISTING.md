@@ -45,13 +45,14 @@ Give a plain instruction like "reply to this email" or "write a short bio," and
 optionally paste the email or notes as context. Get a natural, human-sounding draft
 you can copy or insert.
 
-IN-FIELD BUTTON
-A small button appears in the corner of any text box on the web. Click it for
-Fix / Humanize / Shorten and the field is rewritten in place, with a loading state.
+IN-FIELD BUTTON (EXPERIMENTAL, OFF BY DEFAULT)
+Optionally enable a small button that appears in the corner of text boxes on the
+web. Click it for Fix / Humanize / Shorten and the field is rewritten in place,
+with a loading state.
 
 IN-PLACE EDITING
-Select text in any editable field (Gmail, comment boxes, text areas) and press a
-keyboard shortcut to replace it — with undo.
+Select text in any editable field (Gmail, comment boxes, text areas), then
+right-click or press a keyboard shortcut to replace it in place — with undo.
 
 FREE TO RUN
 • Google Gemini free tier — no credit card required
@@ -79,6 +80,7 @@ an instruction.
 Paste these into the corresponding fields in the dashboard.
 
 - **storage** — Stores the user's chosen AI provider, model, style preferences, and API key locally in the browser.
+- **contextMenus** — Adds the Fix / Humanize / Shorten actions to the right-click menu on selected text.
 - **activeTab** — Reads the user's current text selection on the active tab only when they invoke the extension (keyboard shortcut), so it can rewrite it.
 - **scripting** — Injects the content script into the active tab when needed to capture the selection and replace it in place.
 - **Host permissions** (`generativelanguage.googleapis.com`, `api.groq.com`, `openrouter.ai`, `api.anthropic.com`) — The extension sends the user's text to whichever of these AI provider APIs the user configured, in order to return a rewrite. No other hosts are contacted.

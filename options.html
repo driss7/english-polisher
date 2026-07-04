@@ -13,6 +13,11 @@
       width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit;
     }
     .hint { color: #666; font-size: 12px; margin-top: 4px; }
+    .badge {
+      display: inline-block; margin-left: 6px; padding: 1px 8px; vertical-align: 1px;
+      background: #fff4e0; color: #92600a; border: 1px solid #eed9ae; border-radius: 999px;
+      font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    }
     .hint a { color: #2563eb; }
     button { margin-top: 16px; padding: 8px 20px; border-radius: 8px; border: none; background: #2563eb; color: #fff; font: inherit; cursor: pointer; }
     #status { margin-left: 12px; color: #146c2e; }
@@ -73,12 +78,14 @@
   </fieldset>
 
   <fieldset>
-    <legend>In-page</legend>
+    <legend>In-page <span class="badge">Experimental</span></legend>
     <label style="display:flex;align-items:center;gap:8px;font-weight:500;margin:6px 0">
       <input type="checkbox" id="inlineButton" style="width:auto" />
       Show a quick-polish button inside text fields on web pages
     </label>
-    <p class="hint">A small nib button appears at the bottom-right of any text box; click it for Fix / Humanize / Shorten.</p>
+    <p class="hint">Off by default. A small nib button appears at the bottom-right of a text box; click it for
+    Fix / Humanize / Shorten. Works in most editors (Gmail, ChatGPT, comment boxes) but not all —
+    some sites hide their editor from extensions (e.g. Reddit, Google Docs).</p>
   </fieldset>
 
   <fieldset>

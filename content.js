@@ -4,7 +4,7 @@
 // result panel when the selection is read-only. (Right-click mode was removed.)
 
 (() => {
-  const VERSION = 11;
+  const VERSION = 12;
   // Legacy guard (pre-versioning scripts) or an equal/newer script already active:
   // bail so we never end up with two message listeners double-handling events.
   if (window.__englishPolisherLoaded || (window.__epVersion || 0) >= VERSION) return;
@@ -208,7 +208,7 @@
   // Fix / Humanize / Shorten, which rewrite the field (or its selection) in place
   // with a loading state.
 
-  let epEnabled = true;
+  let epEnabled = false; // experimental — off unless explicitly enabled in settings
   let epHost = null;          // the editable element the dot is attached to
   let epBusy = false;
   let epDot = null, epMenu = null, epHideTimer = null;
@@ -301,13 +301,13 @@
       reposition();
     });
 
-    chrome.storage?.sync?.get({ inlineButton: true })?.then((v) => {
-      epEnabled = v.inlineButton !== false;
+    chrome.storage?.sync?.get({ inlineButton: false })?.then((v) => {
+      epEnabled = v.inlineButton === true;
       if (!epEnabled) hideInline();
     });
     chrome.storage?.onChanged?.addListener((ch, area) => {
       if (area === "sync" && ch.inlineButton) {
-        epEnabled = ch.inlineButton.newValue !== false;
+        epEnabled = ch.inlineButton.newValue === true;
         if (!epEnabled) hideInline();
       }
     });
