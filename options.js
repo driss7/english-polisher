@@ -9,6 +9,7 @@ const DEFAULTS = {
   anthropicKey: "",
   anthropicModel: "claude-haiku-4-5",
   extraStyle: "",
+  inlineButton: true,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -22,14 +23,21 @@ function showBlocks() {
 
 async function load() {
   const cfg = await chrome.storage.sync.get(DEFAULTS);
-  for (const key of Object.keys(DEFAULTS)) $(key).value = cfg[key];
+  for (const key of Object.keys(DEFAULTS)) {
+    const el = $(key);
+    if (el.type === "checkbox") el.checked = !!cfg[key];
+    else el.value = cfg[key];
+  }
   showBlocks();
 }
 
 async function save() {
   const cfg = {};
-  for (const key of Object.keys(DEFAULTS)) cfg[key] = $(key).value.trim ? $(key).value.trim() : $(key).value;
-  cfg.extraStyle = $("extraStyle").value.trim();
+  for (const key of Object.keys(DEFAULTS)) {
+    const el = $(key);
+    if (el.type === "checkbox") cfg[key] = el.checked;
+    else cfg[key] = typeof el.value === "string" ? el.value.trim() : el.value;
+  }
   await chrome.storage.sync.set(cfg);
   $("status").textContent = "Saved ✓";
   setTimeout(() => ($("status").textContent = ""), 2000);

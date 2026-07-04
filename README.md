@@ -23,6 +23,7 @@ No account, no server, no build step — load it unpacked and add a free API key
 
 - ✍️ **Polish mode** — one click to **Fix** grammar & spelling, **Humanize** stiff/robotic text, or **Shorten** it.
 - 💬 **Ask mode** — free-form instructions ("reply to this email politely declining", "write a short bio") with optional context you paste in.
+- 🖊️ **In-field button** — a small nib appears in the corner of any text box on the web; click it for Fix / Humanize / Shorten and the field is rewritten in place, with a loading state.
 - 🆓 **Free by default** — Google Gemini's free tier needs no credit card; Chrome's built-in AI needs no key at all.
 - 🔌 **Five providers** — Gemini, Chrome built-in AI (Gemini Nano), Groq, OpenRouter, and Anthropic Claude. Switch anytime in settings.
 - ⌨️ **In-place editing** — select text in any editable field and press a shortcut to replace it (with undo).
@@ -72,6 +73,16 @@ Click the toolbar icon. Toggle between the two modes with the pill beside the ti
 - **Ask** — type an instruction, optionally expand **add context** to paste the email/notes to work from, then **Generate**. Press `⌘/Ctrl + Enter` to submit.
 
 Every result has a **Copy** button.
+
+### In-field button
+
+Click into any text box on a web page (textarea, comment box, rich editor, or a
+reasonably wide text input) and a small nib button appears in its bottom-right
+corner. Click it to open **Fix / Humanize / Shorten**; the field (or your current
+selection within it) is rewritten in place, with the button spinning and the field
+gently highlighted while it works. Undo with `⌘/Ctrl + Z`.
+
+Prefer it off? Turn it off in **settings → In-page**.
 
 ### Keyboard shortcuts (edit in place on the page)
 

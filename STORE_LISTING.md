@@ -45,6 +45,10 @@ Give a plain instruction like "reply to this email" or "write a short bio," and
 optionally paste the email or notes as context. Get a natural, human-sounding draft
 you can copy or insert.
 
+IN-FIELD BUTTON
+A small button appears in the corner of any text box on the web. Click it for
+Fix / Humanize / Shorten and the field is rewritten in place, with a loading state.
+
 IN-PLACE EDITING
 Select text in any editable field (Gmail, comment boxes, text areas) and press a
 keyboard shortcut to replace it — with undo.
