@@ -4,12 +4,36 @@
 // result panel when the selection is read-only. (Right-click mode was removed.)
 
 (() => {
-  const VERSION = 8;
+  const VERSION = 9;
   // Legacy guard (pre-versioning scripts) or an equal/newer script already active:
   // bail so we never end up with two message listeners double-handling events.
   if (window.__englishPolisherLoaded || (window.__epVersion || 0) >= VERSION) return;
   const firstLoad = !window.__epVersion;
   window.__epVersion = VERSION;
+
+  // Visible marker so you can confirm the script is alive (top frame only).
+  if (window.top === window) console.info("[English Polisher] content script v" + VERSION + " active");
+
+  // Diagnostic — click into a field, then run __epDebug() in the DevTools console.
+  // Defined up-front so it exists even if later setup fails.
+  window.__epDebug = () => {
+    const a = deepActive();
+    const info = {
+      version: VERSION,
+      frame: window.top === window ? "top" : "iframe",
+      url: location.href,
+      enabled: typeof epEnabled === "undefined" ? null : epEnabled,
+      activeTag: a && a.tagName,
+      activeType: a && a.getAttribute && a.getAttribute("type"),
+      isContentEditable: a && a.isContentEditable,
+      contentEditableAttr: a && a.getAttribute && a.getAttribute("contenteditable"),
+      rootType: a && a.getRootNode && a.getRootNode().constructor && a.getRootNode().constructor.name,
+      eligible: !!eligibleHost(a),
+      dotDisplay: epDot && epDot.style.display,
+    };
+    console.log("[English Polisher]", info);
+    return info;
+  };
 
   // Swappable dispatcher: future re-injections replace window.__epHandle instead
   // of adding a second onMessage listener. With all_frames, the background
@@ -253,26 +277,6 @@
     // A field may already be focused when this frame's script loads.
     const initHost = eligibleHost(deepActive());
     if (initHost) { epHost = initHost; reposition(); }
-
-    // Diagnostic: click into a field, then run __epDebug() in the console.
-    window.__epDebug = () => {
-      const a = deepActive();
-      const info = {
-        version: VERSION,
-        frame: window.top === window ? "top" : "iframe",
-        url: location.href,
-        enabled: epEnabled,
-        activeTag: a && a.tagName,
-        activeType: a && a.getAttribute && a.getAttribute("type"),
-        isContentEditable: a && a.isContentEditable,
-        contentEditableAttr: a && a.getAttribute && a.getAttribute("contenteditable"),
-        rootType: a && a.getRootNode && a.getRootNode().constructor && a.getRootNode().constructor.name,
-        eligible: !!eligibleHost(a),
-        dotDisplay: epDot && epDot.style.display,
-      };
-      console.log("[English Polisher]", info);
-      return info;
-    };
   }
 
   function onFocusIn(e) {
